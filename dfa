@@ -1,0 +1,39 @@
+BASE (accept) <-- the start state
+  /: INCOMMENT
+  ": STR
+  ': CHR
+  other: BASE
+
+INCOMMENT (accept)
+  *: COMMENT
+  /: INCOMMENT
+  ": STR
+  ': CHR
+  other: BASE
+
+COMMENT (reject)
+  *: OUTCOMMENT
+  other: COMMENT
+
+OUTCOMMENT (reject)
+  *: OUTCOMMENT
+  /: BASE
+  other: COMMENT
+
+STR (accept)
+  ": BASE
+  \: STRBACKSLASH
+  other: STR
+
+CHR (accept)
+  ': BASE
+  \: CHRBACKSLASH
+  other: CHR
+
+STRBACKSLASH:
+  all: STR
+
+CHRBACKSLASH:
+  all: CHR
+
+
