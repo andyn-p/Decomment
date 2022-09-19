@@ -1,59 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* ascii values of interest */
-int NEWLINE      = 10;
-int SPACE        = 32;
-int STR_LITERAL  = 34;
-int CHR_LITERAL  = 39;
-int ASTERICK     = 42;
-int FORWARDSLASH = 47;
-int BACKSLASH    = 92;
-
-/* store lines number as global so functions can access it */
-int lines = 1;
-int lastCommentLine;
-
 /*  enumerate all state types */
 enum StateType {BASE, COMMENT, INCOM, OUTCOM, STR, CHR, STRBACK, CHRBACK};
 
 /* handles the base case state */
 int handleBase(int c) {
   enum StateType state = BASE;
-  if (c == FORWARDSLASH)     { 
+  if (c == '/') {
     state = INCOM;
-  } else if (c == STR_LITERAL) {
-    putchar(c);
+  } else if (c == '"') {
     state = STR;
-  } else if (c == CHR_LITERAL) {
-    putchar(c);
+  } else if (c == '\'') {
     state = CHR;
-  } else {
+  }
+  if (state != INCOM) {
     putchar(c);
   }
   return state;
 }
 
-/* handles potnetially entering comment */
+/* handles potentially entering comment */
 int handleInComment(int c) {
   enum StateType state = BASE;
-  if (c == ASTERICK) {
-    putchar(SPACE);
+  if (c == '*') {
+    putchar(' ');
     state = COMMENT;
-    lastCommentLine = lines;
-  } else if (c == FORWARDSLASH) {
-    putchar(FORWARDSLASH);
+  } else if (c == '/') {
+    putchar('/');
     state = INCOM;
-  } else if (c == STR_LITERAL) {
-    putchar(FORWARDSLASH);
-    putchar(c);
+  } else if (c == '"') {
     state = STR;
-  } else if (c == CHR_LITERAL) {
-    putchar(FORWARDSLASH);
-    putchar(c);
+  } else if (c == '\'') {
     state = CHR;
-  } else {
-    putchar(FORWARDSLASH);
+  }
+  if (state != COMMENT && state != INCOM) {
+    putchar('/');
     putchar(c);
   }
   return state;
@@ -62,10 +44,10 @@ int handleInComment(int c) {
 /* handles the comment case state */
 int handleComment(int c) {
   enum StateType state = COMMENT;
-  if (c == ASTERICK) {
+  if (c == '*') {
     state = OUTCOM;
-  } else if (c == NEWLINE) {
-    putchar(NEWLINE);
+  } else if (c == '\n') {
+    putchar('\n');
   }
   return state;
 }
@@ -73,12 +55,12 @@ int handleComment(int c) {
 /* handles potentially leaving a comment */
 int handleOutComment(int c) {
   enum StateType state = COMMENT;
-  if (c == FORWARDSLASH) {
+  if (c == '/') {
     state = BASE;
-  } else if (c == ASTERICK) {
+  } else if (c == '*') {
     state = OUTCOM;
-  } else if (c == NEWLINE) {
-    putchar(NEWLINE);
+  } else if (c == '\n') {
+    putchar('\n');
   }
   return state;
 }
@@ -86,12 +68,12 @@ int handleOutComment(int c) {
 /* handles being in a string literal */
 int handleStrLiteral(int c) {
   enum StateType state = STR;
-  putchar(c);
-  if (c == BACKSLASH) {
+  if (c == '\\') {
     state = STRBACK;
-  } else if (c == STR_LITERAL) {
+  } else if (c == '"') {
     state = BASE;
   } 
+  putchar(c);
   return state;
 }
 
@@ -104,12 +86,12 @@ int handleStrBackslash(int c) {
 /* handles being in a character literal */
 int handleChrLiteral(int c) {
   enum StateType state = CHR;
-  putchar(c);
-  if (c == BACKSLASH) {
+  if (c == '\\') {
     state = CHRBACK;
-  } else if (c == CHR_LITERAL) {
+  } else if (c == '\'') {
     state = BASE;
   }
+  putchar(c);
   return state;
 }
 
@@ -124,6 +106,8 @@ int main(void) {
   /* start state off in the base state and as a succesful exit */
   enum StateType state = BASE;
   int exitStatus = EXIT_SUCCESS;
+  int lines = 1;
+  int commentStart = 1;
   int c;
   while ((c = getchar()) != EOF) {
     /* handle each state */
@@ -133,6 +117,9 @@ int main(void) {
         break;
       case INCOM:
         state = handleInComment(c);
+        if (state == COMMENT) {
+          commentStart = lines;
+        }
         break;
       case COMMENT:
         state = handleComment(c);
@@ -153,17 +140,17 @@ int main(void) {
         state = handleChrBackslash(c);
     }
     /* increment line number each time a new line is read */
-    if (c == NEWLINE) {
+    if (c == '\n') {
       lines++;
     }
   }
   /* corner case where code ends with a forwardslash */
   if (state == INCOM) {
-    putchar(FORWARDSLASH);
+    putchar('/');
   }
   /* output errors to stderr */
   if (state == COMMENT || state == OUTCOM) {
-    fprintf(stderr, "Error: line %i: unterminated comment\n", lastCommentLine);
+    fprintf(stderr, "Error: line %i: unterminated comment\n", commentStart);
     exit(EXIT_FAILURE);
   }
 
