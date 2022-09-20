@@ -1,39 +1,39 @@
 BASE (accept) <-- the start state
-  /: INCOMMENT
+  /: POTENTIALCOM
   ": STR
   ': CHR
   other: BASE
 
-INCOMMENT (accept)
+POTENTIALCOM (accept)
   *: COMMENT
-  /: INCOMMENT
+  /: POTENTIALCOM
   ": STR
   ': CHR
   other: BASE
 
 COMMENT (reject)
-  *: OUTCOMMENT
+  *: POTENTIALOUTCOM
   other: COMMENT
 
-OUTCOMMENT (reject)
-  *: OUTCOMMENT
+POTENTIALOUTCOM (reject)
+  *: POTENTIALOUTCOM
   /: BASE
   other: COMMENT
 
 STR (accept)
   ": BASE
-  \: STRBACKSLASH
+  \: STRBACK
   other: STR
 
 CHR (accept)
   ': BASE
-  \: CHRBACKSLASH
+  \: CHRBACK
   other: CHR
 
-STRBACKSLASH:
+STRBACK:
   all: STR
 
-CHRBACKSLASH:
+CHRBACK:
   all: CHR
 
 

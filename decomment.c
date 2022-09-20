@@ -2,70 +2,73 @@
 #include <stdlib.h>
 
 /*  enumerate all state types */
-enum StateType {BASE, COMMENT, INCOM, OUTCOM, STR, CHR, STRBACK, CHRBACK};
+enum StateType {BASE, COMMENT, POTENTIALCOM, POTENTIALOUTCOM, STR, 
+CHR, STRBACK, CHRBACK};
 
-/* handles the base case state */
+/* takes char c and returns state w base state logic */
 int handleBase(int c) {
   enum StateType state = BASE;
   if (c == '/') {
-    state = INCOM;
+    state = POTENTIALCOM;
   } else if (c == '"') {
     state = STR;
   } else if (c == '\'') {
     state = CHR;
   }
-  if (state != INCOM) {
+  if (state != POTENTIALCOM) {
     putchar(c);
   }
   return state;
 }
 
-/* handles potentially entering comment */
-int handleInComment(int c) {
+/* takes char c and returns state w potentially entering comment 
+logic */
+int handlePotentialComment(int c) {
   enum StateType state = BASE;
   if (c == '*') {
     putchar(' ');
     state = COMMENT;
   } else if (c == '/') {
     putchar('/');
-    state = INCOM;
+    state = POTENTIALCOM;
   } else if (c == '"') {
     state = STR;
   } else if (c == '\'') {
     state = CHR;
   }
-  if (state != COMMENT && state != INCOM) {
+  if (state != COMMENT && state != POTENTIALCOM) {
     putchar('/');
     putchar(c);
   }
   return state;
 }
 
-/* handles the comment case state */
+/* takes char c and returns state w in comment logic */
 int handleComment(int c) {
   enum StateType state = COMMENT;
   if (c == '*') {
-    state = OUTCOM;
+    state = POTENTIALOUTCOM;
   } else if (c == '\n') {
     putchar('\n');
   }
   return state;
 }
 
-/* handles potentially leaving a comment */
-int handleOutComment(int c) {
+/* takes char c and returns state w potentially leaving comment 
+logic */
+int handlePotentialOutComment(int c) {
   enum StateType state = COMMENT;
   if (c == '/') {
     state = BASE;
   } else if (c == '*') {
-    state = OUTCOM;
+    state = POTENTIALOUTCOM;
   } else if (c == '\n') {
     putchar('\n');
   }
   return state;
 }
 
-/* handles being in a string literal */
+/* takes char c and returns state w in string literal logic */
 int handleStrLiteral(int c) {
   enum StateType state = STR;
   if (c == '\\') {
@@ -77,13 +80,13 @@ int handleStrLiteral(int c) {
   return state;
 }
 
-/* handles being in a string backslash */
+/* takes char c and returns to string literal state */
 int handleStrBackslash(int c) {
   putchar(c);
   return STR;
 }
 
-/* handles being in a character literal */
+/* takes char c and returns state w in char literal logic */
 int handleChrLiteral(int c) {
   enum StateType state = CHR;
   if (c == '\\') {
@@ -95,7 +98,7 @@ int handleChrLiteral(int c) {
   return state;
 }
 
-/* handles being in a character literal */
+/* takes char c and returns to char literal state */
 int handleChrBackslash(int c) {
   putchar(c);
   return CHR;
@@ -107,7 +110,7 @@ int main(void) {
   enum StateType state = BASE;
   int exitStatus = EXIT_SUCCESS;
   int lines = 1;
-  int commentStart = 1;
+  int commentStart;
   int c;
   while ((c = getchar()) != EOF) {
     /* handle each state */
@@ -115,8 +118,9 @@ int main(void) {
       case BASE:
         state = handleBase(c);
         break;
-      case INCOM:
-        state = handleInComment(c);
+      case POTENTIALCOM:
+        state = handlePotentialComment(c);
+        /* update to latest line where comment starts */
         if (state == COMMENT) {
           commentStart = lines;
         }
@@ -124,8 +128,8 @@ int main(void) {
       case COMMENT:
         state = handleComment(c);
         break;
-      case OUTCOM:
-        state = handleOutComment(c);
+      case POTENTIALOUTCOM:
+        state = handlePotentialOutComment(c);
         break;
       case STR:
         state = handleStrLiteral(c);
@@ -145,11 +149,11 @@ int main(void) {
     }
   }
   /* corner case where code ends with a forwardslash */
-  if (state == INCOM) {
+  if (state == POTENTIALCOM) {
     putchar('/');
   }
   /* output errors to stderr */
-  if (state == COMMENT || state == OUTCOM) {
+  if (state == COMMENT || state == POTENTIALOUTCOM) {
     fprintf(stderr, "Error: line %i: unterminated comment\n", commentStart);
     exit(EXIT_FAILURE);
   }
