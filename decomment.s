@@ -50,9 +50,9 @@ handleBase:
 .LFE0:
 	.size	handleBase, .-handleBase
 	.align	2
-	.global	handleInComment
-	.type	handleInComment, %function
-handleInComment:
+	.global	handlePotentialComment
+	.type	handlePotentialComment, %function
+handlePotentialComment:
 .LFB1:
 	.cfi_startproc
 	stp	x29, x30, [sp, -48]!
@@ -112,7 +112,7 @@ handleInComment:
 	ret
 	.cfi_endproc
 .LFE1:
-	.size	handleInComment, .-handleInComment
+	.size	handlePotentialComment, .-handlePotentialComment
 	.align	2
 	.global	handleComment
 	.type	handleComment, %function
@@ -150,9 +150,9 @@ handleComment:
 .LFE2:
 	.size	handleComment, .-handleComment
 	.align	2
-	.global	handleOutComment
-	.type	handleOutComment, %function
-handleOutComment:
+	.global	handlePotentialOutComment
+	.type	handlePotentialOutComment, %function
+handlePotentialOutComment:
 .LFB3:
 	.cfi_startproc
 	stp	x29, x30, [sp, -48]!
@@ -190,7 +190,7 @@ handleOutComment:
 	ret
 	.cfi_endproc
 .LFE3:
-	.size	handleOutComment, .-handleOutComment
+	.size	handlePotentialOutComment, .-handlePotentialOutComment
 	.align	2
 	.global	handleStrLiteral
 	.type	handleStrLiteral, %function
@@ -331,8 +331,6 @@ main:
 	str	wzr, [sp, 32]
 	mov	w0, 1
 	str	w0, [sp, 40]
-	mov	w0, 1
-	str	w0, [sp, 36]
 	b	.L36
 .L48:
 	ldr	w0, [sp, 44]
@@ -369,7 +367,7 @@ main:
 	b	.L46
 .L40:
 	ldr	w0, [sp, 28]
-	bl	handleInComment
+	bl	handlePotentialComment
 	str	w0, [sp, 44]
 	ldr	w0, [sp, 44]
 	cmp	w0, 1
@@ -384,7 +382,7 @@ main:
 	b	.L46
 .L37:
 	ldr	w0, [sp, 28]
-	bl	handleOutComment
+	bl	handlePotentialOutComment
 	str	w0, [sp, 44]
 	b	.L46
 .L43:
