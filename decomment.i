@@ -621,40 +621,39 @@ extern size_t wcstombs (char *__restrict __s,
 
 
 # 5 "decomment.c"
-enum StateType {BASE, COMMENT, POTCOMMENT, POTOUTCOMMENT, STR, CHR,
- STRBACK, CHRBACK};
+enum StateType {BASE, COMMENT, INCOM, OUTCOM, STR, CHR, STRBACK, CHRBACK};
 
 
 int handleBase(int c) {
   enum StateType state = BASE;
   if (c == '/') {
-    state = POTCOMMENT;
+    state = INCOM;
   } else if (c == '"') {
     state = STR;
   } else if (c == '\'') {
     state = CHR;
   }
-  if (state != POTCOMMENT) {
+  if (state != INCOM) {
     putchar(c);
   }
   return state;
 }
 
 
-int handlePotentialComment(int c) {
+int handleInComment(int c) {
   enum StateType state = BASE;
   if (c == '*') {
     putchar(' ');
     state = COMMENT;
   } else if (c == '/') {
     putchar('/');
-    state = POTCOMMENT;
+    state = INCOM;
   } else if (c == '"') {
     state = STR;
   } else if (c == '\'') {
     state = CHR;
   }
-  if (state != COMMENT && state != POTCOMMENT) {
+  if (state != COMMENT && state != INCOM) {
     putchar('/');
     putchar(c);
   }
@@ -665,7 +664,7 @@ int handlePotentialComment(int c) {
 int handleComment(int c) {
   enum StateType state = COMMENT;
   if (c == '*') {
-    state = POTOUTCOMMENT;
+    state = OUTCOM;
   } else if (c == '\n') {
     putchar('\n');
   }
@@ -673,13 +672,12 @@ int handleComment(int c) {
 }
 
 
-
-int handlePotentialOutComment(int c) {
+int handleOutComment(int c) {
   enum StateType state = COMMENT;
   if (c == '/') {
     state = BASE;
   } else if (c == '*') {
-    state = POTOUTCOMMENT;
+    state = OUTCOM;
   } else if (c == '\n') {
     putchar('\n');
   }
@@ -727,26 +725,25 @@ int main(void) {
 
   enum StateType state = BASE;
   int exitStatus = 
-# 110 "decomment.c" 3 4
+# 108 "decomment.c" 3 4
                   0
-# 110 "decomment.c"
+# 108 "decomment.c"
                               ;
   int lines = 1;
-  int commentStart;
+  int commentStart = 1;
   int c;
   while ((c = getchar()) != 
-# 114 "decomment.c" 3 4
+# 112 "decomment.c" 3 4
                            (-1)
-# 114 "decomment.c"
+# 112 "decomment.c"
                               ) {
 
     switch (state) {
       case BASE:
         state = handleBase(c);
         break;
-      case POTCOMMENT:
-        state = handlePotentialComment(c);
-
+      case INCOM:
+        state = handleInComment(c);
         if (state == COMMENT) {
           commentStart = lines;
         }
@@ -754,8 +751,8 @@ int main(void) {
       case COMMENT:
         state = handleComment(c);
         break;
-      case POTOUTCOMMENT:
-        state = handlePotentialOutComment(c);
+      case OUTCOM:
+        state = handleOutComment(c);
         break;
       case STR:
         state = handleStrLiteral(c);
@@ -775,20 +772,20 @@ int main(void) {
     }
   }
 
-  if (state == POTCOMMENT) {
+  if (state == INCOM) {
     putchar('/');
   }
 
-  if (state == COMMENT || state == POTOUTCOMMENT) {
+  if (state == COMMENT || state == OUTCOM) {
     fprintf(
-# 156 "decomment.c" 3 4
+# 153 "decomment.c" 3 4
            stderr
-# 156 "decomment.c"
+# 153 "decomment.c"
                  , "Error: line %i: unterminated comment\n", commentStart);
     exit(
-# 157 "decomment.c" 3 4
+# 154 "decomment.c" 3 4
         1
-# 157 "decomment.c"
+# 154 "decomment.c"
                     );
   }
 

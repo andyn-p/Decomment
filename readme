@@ -2,7 +2,6 @@ Assignment 1 readme File
 
 ------------------------------------------------------------------------
 What is your name?
-
 Andy Nguyen
 
 
@@ -13,7 +12,7 @@ in the "Policies" web page (also available on armlab in the file
 ~cos217/AuthorizedSourcesList ) to this section of the readme file,
 and edit it as appropriate.
 
-The course's lectures.
+
 
 ------------------------------------------------------------------------
 What unauthorized sources of information did you use to complete the
@@ -31,7 +30,6 @@ unauthorized sources of information.
 
 ------------------------------------------------------------------------
 What is your assessment of the assignment? Was it helpful? Was it fun?
-
 This was a pretty cool assignment. Haven't programmed DFA logic before so it 
 was cool to make something with this kind of design.
 
@@ -40,7 +38,6 @@ was cool to make something with this kind of design.
 (optional) What information can you provide about your submission that
 will help your grader to grade it in the most favorable light? In
 particular, what bugs are in your submission?
-
 I only tested this using ./testdecomment on armlab, so I'm not sure if I may be 
 missing a test case. Aside from that, ./testdecomment seemed to pass all test
 cases.
