@@ -154,7 +154,8 @@ int main(void) {
   }
   /* output errors to stderr */
   if (state == COMMENT || state == POTENTIALOUTCOM) {
-    fprintf(stderr, "Error: line %i: unterminated comment\n", commentStart);
+    fprintf(stderr, "Error: line %i: unterminated comment\n",
+            commentStart);
     exit(EXIT_FAILURE);
   }
 

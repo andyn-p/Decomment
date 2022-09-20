@@ -785,11 +785,12 @@ int main(void) {
 # 157 "decomment.c" 3 4
            stderr
 # 157 "decomment.c"
-                 , "Error: line %i: unterminated comment\n", commentStart);
+                 , "Error: line %i: unterminated comment\n",
+            commentStart);
     exit(
-# 158 "decomment.c" 3 4
+# 159 "decomment.c" 3 4
         1
-# 158 "decomment.c"
+# 159 "decomment.c"
                     );
   }
 
